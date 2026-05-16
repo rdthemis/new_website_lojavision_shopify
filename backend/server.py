@@ -1,88 +1,163 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
+from pydantic import BaseModel, Field
+from typing import List, Optional, Any, Dict
 
+import shopify_client as shopify
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / ".env")
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ["DB_NAME"]]
 
-# Create the main app without a prefix
-app = FastAPI()
-
-# Create a router with the /api prefix
+app = FastAPI(title="Landing E-commerce Shopify API")
 api_router = APIRouter(prefix="/api")
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+# -------------------- Models --------------------
 
-# Add your routes to the router instead of directly to app
+class CartLineInput(BaseModel):
+    merchandiseId: str
+    quantity: int = 1
+
+
+class CartCreateBody(BaseModel):
+    lines: Optional[List[CartLineInput]] = None
+
+
+class CartLinesAddBody(BaseModel):
+    cartId: str
+    lines: List[CartLineInput]
+
+
+class CartLineUpdate(BaseModel):
+    id: str
+    quantity: int
+
+
+class CartLinesUpdateBody(BaseModel):
+    cartId: str
+    lines: List[CartLineUpdate]
+
+
+class CartLinesRemoveBody(BaseModel):
+    cartId: str
+    lineIds: List[str]
+
+
+# -------------------- Routes --------------------
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Landing E-commerce Shopify API", "ok": True}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+@api_router.get("/health")
+async def health():
+    return {
+        "status": "ok",
+        "shopify_domain": os.environ.get("SHOPIFY_STORE_DOMAIN"),
+        "api_version": os.environ.get("SHOPIFY_API_VERSION"),
+        "storefront_token_configured": bool(os.environ.get("SHOPIFY_STOREFRONT_TOKEN")),
+    }
 
-# Include the router in the main app
+
+@api_router.get("/shopify/collections")
+async def get_collections(first: int = 20) -> Dict[str, Any]:
+    try:
+        collections = await shopify.list_collections(first=first)
+        return {"collections": collections}
+    except shopify.ShopifyError as e:
+        logger.error(f"Shopify collections error: {e}")
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@api_router.get("/shopify/products")
+async def get_products(first: int = 24, collection: Optional[str] = None) -> Dict[str, Any]:
+    try:
+        products = await shopify.list_products(first=first, collection_handle=collection)
+        return {"products": products, "collection": collection}
+    except shopify.ShopifyError as e:
+        logger.error(f"Shopify products error: {e}")
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@api_router.post("/shopify/cart")
+async def post_cart_create(body: CartCreateBody) -> Dict[str, Any]:
+    try:
+        lines = [ln.model_dump() for ln in (body.lines or [])]
+        cart = await shopify.cart_create(lines=lines)
+        return {"cart": cart}
+    except shopify.ShopifyError as e:
+        logger.error(f"Shopify cart create error: {e}")
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@api_router.post("/shopify/cart/add")
+async def post_cart_add(body: CartLinesAddBody) -> Dict[str, Any]:
+    try:
+        cart = await shopify.cart_lines_add(
+            cart_id=body.cartId, lines=[ln.model_dump() for ln in body.lines]
+        )
+        return {"cart": cart}
+    except shopify.ShopifyError as e:
+        logger.error(f"Shopify cart add error: {e}")
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@api_router.post("/shopify/cart/update")
+async def post_cart_update(body: CartLinesUpdateBody) -> Dict[str, Any]:
+    try:
+        cart = await shopify.cart_lines_update(
+            cart_id=body.cartId, lines=[ln.model_dump() for ln in body.lines]
+        )
+        return {"cart": cart}
+    except shopify.ShopifyError as e:
+        logger.error(f"Shopify cart update error: {e}")
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@api_router.post("/shopify/cart/remove")
+async def post_cart_remove(body: CartLinesRemoveBody) -> Dict[str, Any]:
+    try:
+        cart = await shopify.cart_lines_remove(cart_id=body.cartId, line_ids=body.lineIds)
+        return {"cart": cart}
+    except shopify.ShopifyError as e:
+        logger.error(f"Shopify cart remove error: {e}")
+        raise HTTPException(status_code=502, detail=str(e))
+
+
+@api_router.get("/shopify/cart/{cart_id:path}")
+async def get_cart(cart_id: str) -> Dict[str, Any]:
+    try:
+        cart = await shopify.cart_get(cart_id=cart_id)
+        return {"cart": cart}
+    except shopify.ShopifyError as e:
+        logger.error(f"Shopify cart get error: {e}")
+        raise HTTPException(status_code=502, detail=str(e))
+
+
 app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
