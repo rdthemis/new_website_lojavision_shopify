@@ -32,6 +32,14 @@ const dict = {
       all: "Todos",
       noProducts: "Nenhum produto encontrado nesta categoria.",
     },
+    bestSellers: {
+      kicker: "Favoritos da semana",
+      title: "Mais Vendidos",
+      badge: "Best Seller",
+      seeAll: "Ver todos",
+      prev: "Anterior",
+      next: "Próximo",
+    },
     product: {
       add: "Adicionar",
       added: "Adicionado",
@@ -103,6 +111,14 @@ const dict = {
       productsKicker: "Hand-picked for you",
       all: "All",
       noProducts: "No products found in this category.",
+    },
+    bestSellers: {
+      kicker: "Weekly favorites",
+      title: "Best Sellers",
+      badge: "Best Seller",
+      seeAll: "See all",
+      prev: "Previous",
+      next: "Next",
     },
     product: {
       add: "Add",

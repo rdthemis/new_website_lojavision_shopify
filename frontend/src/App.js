@@ -5,6 +5,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import CategoryMenu from "@/components/CategoryMenu";
+import BestSellers from "@/components/BestSellers";
 import ProductGrid from "@/components/ProductGrid";
 import Newsletter from "@/components/Newsletter";
 import CartDrawer from "@/components/CartDrawer";
@@ -99,6 +100,8 @@ const Storefront = () => {
             onSelect={onCategorySelect}
           />
         </div>
+
+        <BestSellers onSeeAll={() => scrollTo(productsRef)} />
 
         <div ref={productsRef}>
           <ProductGrid
