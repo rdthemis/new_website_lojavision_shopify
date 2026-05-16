@@ -1,0 +1,183 @@
+{
+  "project_context": {
+    "app_type": "ecommerce",
+    "theme": "light",
+    "archetype": "3 (Pastel & Soft mixed with Vibrant Play)",
+    "aesthetic": "Clean e jovem (Clean and youthful)",
+    "description": "A single-page Shopify e-commerce site spanning multiple niches (Tech, Fashion, Home, Tools). Features a clean, airy, youthful design with slow-motion entry animations, a hero carousel, bento-style category menu, staggered product grid, and a sliding mini-cart."
+  },
+  "typography": {
+    "fonts": {
+      "headings": {
+        "family": "Outfit, sans-serif",
+        "description": "Friendly, geometric sans-serif that feels young and modern."
+      },
+      "body": {
+        "family": "Plus Jakarta Sans, sans-serif",
+        "description": "Extremely clean and highly legible sans-serif for UI elements."
+      }
+    },
+    "scale": {
+      "h1": "text-5xl md:text-6xl tracking-tight leading-none font-bold",
+      "h2": "text-4xl md:text-5xl tracking-tight leading-tight font-semibold",
+      "h3": "text-2xl md:text-3xl tracking-tight font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm tracking-wide uppercase font-semibold"
+    }
+  },
+  "colors": {
+    "background": {
+      "primary": "#FAFAFA",
+      "secondary": "#FFFFFF",
+      "tertiary": "#F3F4F6",
+      "description": "Bright, airy light gray and pure white to create a clean canvas."
+    },
+    "text": {
+      "primary": "#0A0A0A",
+      "secondary": "#525252",
+      "tertiary": "#A3A3A3"
+    },
+    "accent": {
+      "primary": "#FF574D",
+      "hover": "#E0463D",
+      "description": "A vibrant coral/electric terracotta used as a strong, youthful accent for primary buttons and highlights."
+    },
+    "border": "#E5E7EB"
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous spacing. Use p-8, p-12 to let elements breathe. No cramped containers.",
+    "border_radius": "rounded-3xl for major containers, rounded-2xl for inner cards/buttons. Soft and approachable.",
+    "grids": {
+      "categories": "Bento-style asymmetric grid (e.g., span-2, span-1).",
+      "products": "Staggered masonry or clean grid with wide gaps (gap-8 md:gap-12)."
+    },
+    "header": "Sticky glassmorphism header (backdrop-blur-xl bg-white/70) with subtle border-b (border-black/5)."
+  },
+  "motion_and_interactions": {
+    "philosophy": "Slow motion entry effect is critical. Premium, gentle, staggered.",
+    "entry_animation": {
+      "duration": "1.2s",
+      "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "variants": {
+        "hidden": { "opacity": 0, "y": 40 },
+        "visible": { "opacity": 1, "y": 0 }
+      },
+      "stagger_delay": 0.2
+    },
+    "hero_carousel": "Slow Ken-Burns effect on images (scale from 1.1 to 1.0 over 4s) with soft crossfades.",
+    "hover_effects": "Subtle scale up (scale-105) for images, smooth background color transitions for buttons. No violent snaps."
+  },
+  "components": {
+    "hero_banner": {
+      "style": "Full width or large rounded container (w-[95%] mx-auto mt-4 rounded-3xl overflow-hidden). Text overlays must use a gradient scrim (bg-gradient-to-t from-black/60 to-transparent) to ensure readability."
+    },
+    "category_menu": {
+      "style": "Visual tiles with background images, dark overlay on hover, white text. Or clean pill-shaped tabs."
+    },
+    "product_card": {
+      "style": "Cardless or flat white cards (bg-white rounded-2xl p-4). Image takes up 70% of height. Soft shadow on hover (shadow-[0_8px_30px_rgb(0,0,0,0.04)]). Accent color add-to-cart button."
+    },
+    "mini_cart": {
+      "style": "Slide-in drawer from the right. Glassmorphic backdrop. Clean line items with quantity controls. Prominent checkout button."
+    }
+  },
+  "media": {
+    "hero": [
+      {
+        "url": "https://images.unsplash.com/photo-1758525223709-2dc38e53f55d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2Mzl8MHwxfHNlYXJjaHwzfHx5b3V0aGZ1bCUyMGxpZmVzdHlsZSUyMHNob3BwaW5nJTIwcGFzdGVsfGVufDB8fHx8MTc3ODkwNTk2Mnww&ixlib=rb-4.1.0&q=85",
+        "description": "Lifestyle youth shopping",
+        "category": "hero"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1649083048381-520a5b3d91ff?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBob21lJTIwZGVjb3IlMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Modern bright living room",
+        "category": "hero"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1774773135752-c72ccb1a0b5e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwzfHx0cmVuZHklMjB5b3V0aCUyMGZhc2hpb24lMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Trendy youth fashion",
+        "category": "hero"
+      }
+    ],
+    "categories": [
+      {
+        "url": "https://images.unsplash.com/photo-1493723843671-1d655e66ac1c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBlbGVjdHJvbmljcyUyMHBhc3RlbCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Tech / Electronics",
+        "category": "category_tile"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1774773133575-64e79d3be22c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHx0cmVuZHklMjB5b3V0aCUyMGZhc2hpb24lMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Fashion / Moda",
+        "category": "category_tile"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1526057565006-20beab8dd2ed?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob21lJTIwZGVjb3IlMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Home Decor / Decoração",
+        "category": "category_tile"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1671803854413-0773f8de4f8e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjB0b29scyUyMGJyaWdodCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Tools / Ferramentas",
+        "category": "category_tile"
+      }
+    ],
+    "products": [
+      {
+        "url": "https://images.unsplash.com/photo-1665054806483-5e86924a5835?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBlbGVjdHJvbmljcyUyMHBhc3RlbCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Tech Product 1",
+        "category": "product_image"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBlbGVjdHJvbmljcyUyMHBhc3RlbCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Tech Product 2",
+        "category": "product_image"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1766465524004-f1649d7d8236?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHw0fHx0cmVuZHklMjB5b3V0aCUyMGZhc2hpb24lMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Fashion Product 1",
+        "category": "product_image"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1778480976317-d25017eed6e5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwyfHx0cmVuZHklMjB5b3V0aCUyMGZhc2hpb24lMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Fashion Product 2",
+        "category": "product_image"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1554995207-c18c203602cb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwzfHxtb2Rlcm4lMjBob21lJTIwZGVjb3IlMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Home Decor Product 1",
+        "category": "product_image"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1672860044506-e3ec09653e82?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTB8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBob21lJTIwZGVjb3IlMjBicmlnaHR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Home Decor Product 2",
+        "category": "product_image"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1672033282598-662d5a93b9f4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjB0b29scyUyMGJyaWdodCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Tools Product 1",
+        "category": "product_image"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1750054976309-9164e39cdc8d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB0b29scyUyMGJyaWdodCUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc4OTA1OTYyfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Tools Product 2",
+        "category": "product_image"
+      }
+    ],
+    "brand_logo": [
+      {
+        "url": "https://images.unsplash.com/photo-1774271694290-9edc62c53099?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxOTF8MHwxfHNlYXJjaHwxfHxicmFuZCUyMGxvZ28lMjBjbGVhbiUyMHNpbXBsZXxlbnwwfHx8fDE3Nzg5MDU5Njd8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Muji minimalist logo",
+        "category": "logo"
+      }
+    ]
+  },
+  "instructions_to_main_agent": {
+    "libraries_to_install": [
+      "framer-motion",
+      "lucide-react",
+      "@radix-ui/react-icons"
+    ],
+    "testing": "All interactive elements, buttons, inputs, links, and forms MUST include a data-testid attribute in kebab-case representing their role.",
+    "general": "Do not create separate pages/routes. Build it as one continuous scrolling view. Use framer-motion extensively for staggered text entry and slow ken-burns zooms as dictated. Include a robust PT/EN text toggle (can be a simple state). The Shopify checkout redirect can just be a dummy action or form submission linking to Shopify."
+  }
+}
