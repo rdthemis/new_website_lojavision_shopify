@@ -4,6 +4,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { CartProvider } from "@/contexts/CartContext";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
+import TrustBar from "@/components/TrustBar";
 import CategoryMenu from "@/components/CategoryMenu";
 import BestSellers from "@/components/BestSellers";
 import ProductGrid from "@/components/ProductGrid";
@@ -93,6 +94,8 @@ const Storefront = () => {
           onCta={() => scrollTo(productsRef)}
           onSecondary={() => scrollTo(categoriesRef)}
         />
+
+        <TrustBar />
 
         <div ref={categoriesRef}>
           <CategoryMenu

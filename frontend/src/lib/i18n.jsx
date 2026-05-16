@@ -9,6 +9,12 @@ const dict = {
       about: "Sobre",
       cart: "Carrinho",
     },
+    trust: {
+      shipping: { title: "Frete grátis", sub: "Em compras acima de R$ 199" },
+      secure: { title: "Compra 100% segura", sub: "Pagamento criptografado" },
+      installments: { title: "Pague em até 12x", sub: "No cartão, sem juros*" },
+      returns: { title: "Devolução em 7 dias", sub: "Sem perguntas, sem stress" },
+    },
     hero: {
       eyebrow: "Coleção 2026",
       titles: [
@@ -96,6 +102,12 @@ const dict = {
       categories: "Categories",
       about: "About",
       cart: "Cart",
+    },
+    trust: {
+      shipping: { title: "Free shipping", sub: "On orders above R$ 199" },
+      secure: { title: "100% secure checkout", sub: "Encrypted payment" },
+      installments: { title: "Pay in up to 12×", sub: "Interest-free on credit card*" },
+      returns: { title: "7-day returns", sub: "No questions, no hassle" },
     },
     hero: {
       eyebrow: "2026 Collection",
