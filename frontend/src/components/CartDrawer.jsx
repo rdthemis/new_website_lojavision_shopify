@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, X, ShoppingBag, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -48,6 +48,9 @@ const CartDrawer = () => {
           <SheetTitle className="font-display text-2xl tracking-tight font-semibold text-neutral-900">
             {t.cart.title}
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            {t.cart.emptySub}
+          </SheetDescription>
         </SheetHeader>
 
         {items.length === 0 ? (
