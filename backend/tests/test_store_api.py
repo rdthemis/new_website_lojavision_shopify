@@ -157,6 +157,90 @@ class TestNewsletter:
         assert after == before + 1, f"count did not increment: {before} -> {after}"
 
 
+# ----- Reviews (social proof, auto-seeded on first request) -----
+class TestReviews:
+    def test_reviews_pt_default(self, api):
+        r = api.get(f"{BASE_URL}/api/reviews?lang=pt&limit=8", timeout=20)
+        assert r.status_code == 200
+        d = r.json()
+        assert d["lang"] == "pt"
+        assert d["total"] == 8
+        assert isinstance(d["average_rating"], (int, float))
+        assert 4.5 <= d["average_rating"] <= 5.0
+        reviews = d["reviews"]
+        assert len(reviews) == 8
+        for rv in reviews:
+            assert "_id" not in rv
+            assert rv.get("id")
+            assert rv.get("customer_name")
+            assert isinstance(rv.get("rating"), int) and 1 <= rv["rating"] <= 5
+            assert rv.get("headline")
+            assert rv.get("body")
+            assert rv.get("product_title")
+            assert rv.get("product_image")
+            assert rv.get("verified") is True
+            assert rv.get("created_at")
+            # localized fields should NOT leak raw _en/_pt keys
+            assert "headline_en" not in rv
+            assert "headline_pt" not in rv
+            assert "body_en" not in rv
+            assert "body_pt" not in rv
+
+    def test_reviews_en_localization(self, api):
+        rp = api.get(f"{BASE_URL}/api/reviews?lang=pt&limit=8", timeout=20).json()
+        re_ = api.get(f"{BASE_URL}/api/reviews?lang=en&limit=8", timeout=20).json()
+        assert re_["lang"] == "en"
+        assert re_["total"] == 8
+        # Same ids in same order, different headlines/bodies
+        pt_by_id = {r["id"]: r for r in rp["reviews"]}
+        en_by_id = {r["id"]: r for r in re_["reviews"]}
+        assert set(pt_by_id.keys()) == set(en_by_id.keys())
+        # At least one headline/body differs (proves localization)
+        differs = sum(
+            1
+            for i in pt_by_id
+            if pt_by_id[i]["headline"] != en_by_id[i]["headline"]
+            or pt_by_id[i]["body"] != en_by_id[i]["body"]
+        )
+        assert differs >= 7, f"expected localization, only {differs} differ"
+
+    def test_reviews_limit_3_sorted_desc(self, api):
+        r = api.get(f"{BASE_URL}/api/reviews?limit=3", timeout=20)
+        assert r.status_code == 200
+        d = r.json()
+        assert len(d["reviews"]) == 3
+        # total still reflects full collection
+        assert d["total"] == 8
+        # ordered by created_at desc
+        dates = [rv["created_at"] for rv in d["reviews"]]
+        assert dates == sorted(dates, reverse=True)
+
+    def test_reviews_limit_caps_at_50(self, api):
+        r = api.get(f"{BASE_URL}/api/reviews?limit=100", timeout=20)
+        assert r.status_code == 200
+        d = r.json()
+        # Only 8 seeded; even with cap 50 we only get up to total
+        assert len(d["reviews"]) <= 50
+        assert len(d["reviews"]) == d["total"]
+        assert d["total"] == 8
+
+    def test_reviews_idempotent_seed(self, api):
+        # Hit endpoint twice — total must stay at 8 (no duplicate seeding)
+        d1 = api.get(f"{BASE_URL}/api/reviews?limit=8", timeout=20).json()
+        d2 = api.get(f"{BASE_URL}/api/reviews?limit=8", timeout=20).json()
+        assert d1["total"] == 8
+        assert d2["total"] == 8
+        ids1 = {r["id"] for r in d1["reviews"]}
+        ids2 = {r["id"] for r in d2["reviews"]}
+        assert ids1 == ids2
+
+    def test_reviews_invalid_lang_falls_back_to_pt(self, api):
+        r = api.get(f"{BASE_URL}/api/reviews?lang=zz&limit=2", timeout=20)
+        assert r.status_code == 200
+        d = r.json()
+        assert d["lang"] == "pt"
+
+
 # ----- Direct Shopify proxy (now LIVE, expect 200) -----
 class TestShopifyProxy:
     def test_shopify_collections_direct(self, api):

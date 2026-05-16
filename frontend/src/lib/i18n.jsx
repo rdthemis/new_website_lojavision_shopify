@@ -40,6 +40,14 @@ const dict = {
       prev: "Anterior",
       next: "Próximo",
     },
+    reviews: {
+      kicker: "Quem comprou recomenda",
+      title: "O que os clientes dizem",
+      avgPrefix: "Avaliação média",
+      basedOn: (n) => `Baseado em ${n} avaliações verificadas`,
+      verified: "Comprador verificado",
+      boughtPrefix: "Comprou:",
+    },
     product: {
       add: "Adicionar",
       added: "Adicionado",
@@ -119,6 +127,14 @@ const dict = {
       seeAll: "See all",
       prev: "Previous",
       next: "Next",
+    },
+    reviews: {
+      kicker: "From happy customers",
+      title: "What buyers are saying",
+      avgPrefix: "Average rating",
+      basedOn: (n) => `Based on ${n} verified reviews`,
+      verified: "Verified buyer",
+      boughtPrefix: "Bought:",
     },
     product: {
       add: "Add",

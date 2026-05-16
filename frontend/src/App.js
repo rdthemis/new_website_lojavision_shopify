@@ -7,6 +7,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import CategoryMenu from "@/components/CategoryMenu";
 import BestSellers from "@/components/BestSellers";
 import ProductGrid from "@/components/ProductGrid";
+import Reviews from "@/components/Reviews";
 import Newsletter from "@/components/Newsletter";
 import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
@@ -112,6 +113,8 @@ const Storefront = () => {
             loading={loading}
           />
         </div>
+
+        <Reviews />
 
         <Newsletter />
       </main>

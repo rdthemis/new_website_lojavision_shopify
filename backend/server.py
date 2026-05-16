@@ -13,6 +13,7 @@ from typing import List, Optional, Any, Dict
 
 import shopify_client as shopify
 from demo_data import DEMO_COLLECTIONS, filter_demo_products
+from reviews_seed import SEED_REVIEWS, project as project_review
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -245,6 +246,35 @@ async def newsletter_subscribe(body: NewsletterSubscribeBody) -> Dict[str, Any]:
 async def newsletter_count() -> Dict[str, Any]:
     n = await db.newsletter_subscribers.count_documents({})
     return {"count": n}
+
+
+# ----- Reviews (social proof; seeded on first read) -----
+
+async def _ensure_reviews_seeded() -> None:
+    count = await db.reviews.count_documents({})
+    if count == 0:
+        await db.reviews.insert_many([{**r} for r in SEED_REVIEWS])
+
+
+@api_router.get("/reviews")
+async def get_reviews(limit: int = 8, lang: str = "pt") -> Dict[str, Any]:
+    lang = lang if lang in ("pt", "en") else "pt"
+    await _ensure_reviews_seeded()
+    cursor = db.reviews.find({}, {"_id": 0}).sort("created_at", -1).limit(max(1, min(limit, 50)))
+    docs = await cursor.to_list(length=limit)
+    items = [project_review(r, lang=lang) for r in docs]
+
+    total = await db.reviews.count_documents({})
+    pipeline = [{"$group": {"_id": None, "avg": {"$avg": "$rating"}}}]
+    agg = await db.reviews.aggregate(pipeline).to_list(length=1)
+    average = round(agg[0]["avg"], 2) if agg else 0.0
+
+    return {
+        "reviews": items,
+        "total": total,
+        "average_rating": average,
+        "lang": lang,
+    }
 
 
 @api_router.post("/store/checkout")

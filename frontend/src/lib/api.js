@@ -29,3 +29,8 @@ export const subscribeNewsletter = async (email, lang = "pt") => {
   const { data } = await api.post(`/newsletter/subscribe`, { email, lang });
   return data; // { ok, already_subscribed, coupon_code, discount_percent, email }
 };
+
+export const fetchReviews = async (lang = "pt", limit = 8) => {
+  const { data } = await api.get(`/reviews`, { params: { lang, limit } });
+  return data; // { reviews, total, average_rating, lang }
+};

@@ -1,0 +1,47 @@
+{
+  "summary": "Iteration 3 validated the new Reviews / Social-Proof feature (backend + frontend) and re-ran regression. Backend pytest 19/19 passing (added TestReviews class with 6 cases). Frontend Reviews section renders correctly between products grid and newsletter, summary card shows average 4.8 / 8 reviews, 6 cards render with star rating, verified badge, customer initials and 'Comprou:' line. PT/EN toggle flips title, verified badge text, bought prefix, headlines/bodies, AND date format (pt-BR '13 de mai. de 2026' vs en-US 'May 13, 2026'). All previous regression flows (hero, best sellers, products, newsletter) still working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_store_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py /api/reviews correctly excludes _id with find projection {'_id': 0}; project_review() further whitelists fields — verified no _id leak.",
+    "_ensure_reviews_seeded() is idempotent (checks count_documents==0 before insert_many). Race condition is theoretically possible if two requests hit a fresh DB simultaneously, but unique 'id' field would still deduplicate at app layer; recommend adding a unique index on db.reviews.id (or compound on product_title+customer_name) if scaling.",
+    "Reviews.jsx caps render at slice(0, 6) even when API returns 8 — by design, but worth surfacing a 'See more' control later.",
+    "server.py demo branch of /api/store/checkout (lines ~292-302) still has dead-code 'total = 0.0' loop — minor cleanup carried over from iter 2."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_store_api.py (added TestReviews class with 6 cases: PT default + shape/no-_id, EN localization parity, limit=3 sorted desc, limit=100 caps at 50/total, idempotent seed, invalid lang fallback to pt)"
+  ],
+  "success_rate": {"backend": "100% (19/19)", "frontend": "100% on Reviews feature + regression"},
+  "test_credentials": "N/A — no auth in app",
+  "seed_data_creation": "db.reviews is auto-seeded by backend on first GET /api/reviews; tests rely on this seed and verify idempotency (running endpoint twice keeps total=8). No manual seeding by tests.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Reviews feature is fully integrated. GET /api/reviews?lang=pt|en&limit=N (cap 50) returns {reviews, total=8, average_rating=4.75, lang}. db.reviews is auto-seeded once on first request from /app/backend/reviews_seed.py SEED_REVIEWS (8 entries). project() in reviews_seed.py localizes headline_pt/headline_en + body_pt/body_en to flat 'headline'/'body' fields. Frontend Reviews.jsx renders 6 of 8 cards in a 3-col grid with framer-motion stagger. data-testid coverage: reviews-section, reviews-title, reviews-summary, reviews-average, reviews-count, reviews-grid, review-card-{uuid}, review-verified-badge. PT/EN toggle in header changes lang in I18nContext which re-fetches reviews. Shopify Storefront token still LIVE — checkout still routes to lojavirtualvision.com.",
+  "verified_features": [
+    "GET /api/reviews?lang=pt&limit=8 -> 200, total=8, average~4.75 (4.8 rounded), 8 reviews each with id/customer_name/rating(1-5)/headline/body/product_title/product_image/verified=true/created_at, no _id, no leaked headline_pt/headline_en/body_pt/body_en",
+    "GET /api/reviews?lang=en -> same 8 ids, English headlines and bodies (>=7 of 8 differ from PT)",
+    "GET /api/reviews?limit=3 -> exactly 3 reviews ordered by created_at desc, total still 8",
+    "GET /api/reviews?limit=100 -> capped to total seeded (8), <=50",
+    "Idempotent seed: two consecutive GETs keep total=8 with identical id set",
+    "Invalid lang query (?lang=zz) falls back to lang='pt'",
+    "Backend regression: /api/health, /api/store/collections (shopify), /api/store/products (BRL), /api/store/checkout (real lojavirtualvision.com URL), /api/newsletter/subscribe + count all still passing",
+    "Frontend Reviews section placed between products grid (y~2669) and newsletter (y~6735) — reviews-section y~5969",
+    "Summary card: reviews-average='4.8', reviews-count='Baseado em 8 avaliações verificadas'",
+    "6 review cards rendered with data-testid='review-card-{id}', star rating, headline, body, customer name + initials avatar, 'Comprador verificado' badge, 'Comprou: <product_title>' line",
+    "PT/EN toggle: title 'O que os clientes dizem' <-> 'What buyers are saying'; verified badge 'Comprador verificado' <-> 'Verified buyer'; 'Comprou:' <-> 'Bought:'; headlines/bodies swap (e.g. 'Surpreendente! Vale cada centavo.' <-> 'Surprising! Worth every penny.')",
+    "Date format adapts: PT '13 de mai. de 2026', EN 'May 13, 2026'",
+    "Regression: hero carousel, best sellers strip and trending products grid all still render after Reviews insertion"
+  ]
+}
