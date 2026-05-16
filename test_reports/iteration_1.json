@@ -1,0 +1,54 @@
+{
+  "summary": "End-to-end testing of Shopify landing storefront completed. Backend (10/10 pytest cases) and frontend (hero carousel, language toggle, category filtering, cart, checkout demo fallback) all working correctly. Demo fallback path is fully exercised since the Shopify Storefront token returns 401 (expected per problem statement).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Cart drawer (Radix Sheet)", "issues": ["Console a11y warning: Missing `Description` or `aria-describedby={undefined}` for DialogContent. Not blocking, but adding SheetDescription (or aria-describedby) inside CartDrawer would silence it and improve a11y."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_store_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Add SheetDescription or aria-describedby in CartDrawer to fix Radix a11y warning."
+  ],
+  "critical_code_review_comments": [
+    "server.py /api/store/checkout currently computes `total` but never returns/uses it (dead code lines 205-207). Safe to remove.",
+    "server.py uses deprecated FastAPI `@app.on_event('shutdown')` — consider migrating to lifespan handler (low priority).",
+    "Backend MONGO_URL and DB_NAME are loaded with `os.environ[...]` which will crash hard if missing — acceptable per fail-fast policy but worth documenting.",
+    "All API endpoints correctly prefixed with /api. data-testid attributes are present on every interactive element verified during UI tests."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_store_api.py (new)"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "N/A — no auth in app",
+  "seed_data_creation": "None — backend uses in-process DEMO_COLLECTIONS / DEMO_PRODUCTS fallback automatically.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend exposes unified endpoints under /api/store/* (collections, products, checkout) that gracefully fall back to demo data when Shopify token is invalid. Direct /api/shopify/* proxies return 502 by design when token invalid. Frontend uses framer-motion entrance animations; allow ~1-2s settling after navigation/clicks. data-testid coverage is excellent. To validate Shopify integration when a real token is provided, simply swap SHOPIFY_STOREFRONT_TOKEN in backend/.env, restart backend, and rerun the pytest file — assertions for `data_source` will need to flip from 'demo' to 'shopify'.",
+  "verified_features": [
+    "GET /api/health → 200 with shopify_domain, api_version, storefront_token_configured=true",
+    "GET /api/store/collections → data_source=demo, 4 collections [tech, moda, decoracao, ferramentas]",
+    "GET /api/store/products → 8 demo products; per-collection filter returns 2 each",
+    "GET /api/store/products?collection=tech includes 'Smart Watch Flex Pro' and 'Wireless Earbuds Air'",
+    "POST /api/store/checkout → 200 with data_source=demo and friendly message (no 500)",
+    "GET /api/shopify/collections → 502 with detail (expected — invalid token)",
+    "Frontend landing page loads, no router (single page)",
+    "Hero carousel: prev/next arrows, dots (0/1/2), title transitions verified",
+    "Hero CTA primary scrolls to products; secondary scrolls to categories",
+    "Language toggle PT↔EN updates nav labels (Início→Home)",
+    "Category tiles (tech featured 2x2) clickable; tech tile filters product grid to 2 cards",
+    "Category 'Todos' (category-all-toggle) restores 8 products",
+    "Add-to-cart works; badge increments 1→2; product card shows 'Adicionado' state",
+    "Cart drawer opens from right; shows items, qty controls, remove button, subtotal R$ 488,90 (299.90+189.00)",
+    "Checkout button triggers demo toast/notice; no crash",
+    "Footer shows 'Modo Demo' badge"
+  ]
+}
