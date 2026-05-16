@@ -113,7 +113,11 @@ const Storefront = () => {
         <Newsletter />
       </main>
 
-      <Footer dataSource={dataSource} />
+      <Footer
+        dataSource={dataSource}
+        collections={collections}
+        onCategorySelect={onCategorySelect}
+      />
       <CartDrawer />
       <Toaster position="top-center" richColors />
     </div>

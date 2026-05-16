@@ -3,7 +3,7 @@ import { Instagram, Twitter, Youtube, Mail } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { useI18n } from "@/lib/i18n";
 
-const Footer = ({ dataSource }) => {
+const Footer = ({ dataSource, collections = [], onCategorySelect }) => {
   const { t, lang } = useI18n();
   const year = new Date().getFullYear();
 
@@ -60,10 +60,26 @@ const Footer = ({ dataSource }) => {
               {t.footer.sections.shop}
             </div>
             <ul className="space-y-2 text-sm text-neutral-200">
-              <li>Tech</li>
-              <li>Moda</li>
-              <li>Decoração</li>
-              <li>Ferramentas</li>
+              {collections.length > 0 ? (
+                collections.slice(0, 4).map((c) => (
+                  <li key={c.handle}>
+                    <button
+                      data-testid={`footer-shop-${c.handle}`}
+                      onClick={() => onCategorySelect?.(c.handle)}
+                      className="hover:text-white transition-colors text-left"
+                    >
+                      {c.title}
+                    </button>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li>Tech</li>
+                  <li>Moda</li>
+                  <li>Decoração</li>
+                  <li>Ferramentas</li>
+                </>
+              )}
             </ul>
           </div>
           <div>
