@@ -22,24 +22,28 @@ export const CartProvider = ({ children }) => {
     }
   }, [items]);
 
-  const add = useCallback((product) => {
+  const add = useCallback((product, opts = {}) => {
     setItems((prev) => {
-      const variant = product.variants?.[0];
+      const variant = opts.variant || product.variants?.[0];
       const merchandiseId = variant?.id;
       if (!merchandiseId) return prev;
+      const qty = Math.max(1, Number(opts.quantity) || 1);
+      const variantTitle = opts.variantTitle || variant?.title || "";
+      const variantImage = opts.variantImage || variant?.image?.url || null;
       const existing = prev.find((i) => i.merchandiseId === merchandiseId);
       if (existing) {
         return prev.map((i) =>
-          i.merchandiseId === merchandiseId ? { ...i, quantity: i.quantity + 1 } : i
+          i.merchandiseId === merchandiseId ? { ...i, quantity: i.quantity + qty } : i
         );
       }
       return [
         ...prev,
         {
           merchandiseId,
-          quantity: 1,
+          quantity: qty,
           title: product.title,
-          image: product.featuredImage?.url || product.images?.[0]?.url,
+          variantTitle,
+          image: variantImage || product.featuredImage?.url || product.images?.[0]?.url,
           price: parseFloat(variant?.price?.amount || product.priceMin?.amount || "0"),
           currency: variant?.price?.currencyCode || product.priceMin?.currencyCode || "BRL",
           handle: product.handle,

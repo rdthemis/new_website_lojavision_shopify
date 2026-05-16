@@ -72,6 +72,62 @@ class TestStoreProducts:
         assert "_id" not in p
 
 
+# ----- Product detail fields (modal needs these) -----
+class TestStoreProductDetailFields:
+    """New fields required for the Product Detail Modal."""
+
+    def test_products_expose_modal_fields(self, api):
+        r = api.get(f"{BASE_URL}/api/store/products?first=3", timeout=25)
+        assert r.status_code == 200
+        d = r.json()
+        prods = d["products"]
+        assert len(prods) >= 1
+        for p in prods:
+            # descriptionHtml is a string (possibly empty)
+            assert "descriptionHtml" in p
+            assert isinstance(p["descriptionHtml"], str)
+            # options is an array of {id, name, values:[]}
+            assert "options" in p and isinstance(p["options"], list)
+            for o in p["options"]:
+                assert "name" in o
+                assert "values" in o and isinstance(o["values"], list)
+            # variants enriched
+            assert p.get("variants"), "expected at least one variant"
+            for v in p["variants"]:
+                assert "selectedOptions" in v and isinstance(v["selectedOptions"], list)
+                for so in v["selectedOptions"]:
+                    assert "name" in so and "value" in so
+                # image can be None or a dict with url
+                if v.get("image") is not None:
+                    assert isinstance(v["image"], dict)
+                    assert "url" in v["image"]
+                # compareAtPrice can be None or dict
+                if v.get("compareAtPrice") is not None:
+                    assert isinstance(v["compareAtPrice"], dict)
+            assert "_id" not in p
+
+    def test_collection_products_share_same_shape(self, api):
+        # Reused fragment — same enriched shape via collection endpoint
+        r = api.get(
+            f"{BASE_URL}/api/store/products?collection=mejores-ventas&first=3",
+            timeout=25,
+        )
+        assert r.status_code == 200
+        d = r.json()
+        prods = d.get("products") or []
+        if not prods:
+            pytest.skip("mejores-ventas collection empty on this storefront")
+        p = prods[0]
+        assert "descriptionHtml" in p
+        assert "options" in p and isinstance(p["options"], list)
+        assert p.get("variants"), "expected at least one variant"
+        v = p["variants"][0]
+        assert "selectedOptions" in v
+        assert "image" in v
+        assert "compareAtPrice" in v
+        assert "_id" not in p
+
+
 # ----- Checkout (LIVE Shopify -> real checkoutUrl) -----
 class TestCheckoutShopify:
     def test_checkout_returns_lojavirtualvision_url(self, api):

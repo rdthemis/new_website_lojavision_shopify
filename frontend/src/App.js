@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import "@/App.css";
 import { I18nProvider } from "@/lib/i18n";
 import { CartProvider } from "@/contexts/CartContext";
+import { ProductModalProvider } from "@/contexts/ProductModalContext";
 import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import TrustBar from "@/components/TrustBar";
@@ -11,6 +12,7 @@ import ProductGrid from "@/components/ProductGrid";
 import Reviews from "@/components/Reviews";
 import Newsletter from "@/components/Newsletter";
 import CartDrawer from "@/components/CartDrawer";
+import ProductModal from "@/components/ProductModal";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { fetchCollections, fetchProducts } from "@/lib/api";
@@ -128,6 +130,7 @@ const Storefront = () => {
         onCategorySelect={onCategorySelect}
       />
       <CartDrawer />
+      <ProductModal />
       <Toaster position="top-center" richColors />
     </div>
   );
@@ -137,7 +140,9 @@ function App() {
   return (
     <I18nProvider>
       <CartProvider>
-        <Storefront />
+        <ProductModalProvider>
+          <Storefront />
+        </ProductModalProvider>
       </CartProvider>
     </I18nProvider>
   );

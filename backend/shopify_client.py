@@ -57,41 +57,55 @@ query Collections($first: Int!) {
 }
 """
 
-PRODUCTS_QUERY = """
-query Products($first: Int!) {
-  products(first: $first) {
+PRODUCT_FRAGMENT = """
+fragment ProductFields on Product {
+  id
+  handle
+  title
+  description
+  descriptionHtml
+  tags
+  productType
+  vendor
+  featuredImage { url altText }
+  images(first: 8) { edges { node { url altText } } }
+  options { id name values }
+  priceRange {
+    minVariantPrice { amount currencyCode }
+    maxVariantPrice { amount currencyCode }
+  }
+  variants(first: 50) {
     edges {
       node {
         id
-        handle
         title
-        description
-        tags
-        productType
-        vendor
-        featuredImage { url altText }
-        images(first: 4) { edges { node { url altText } } }
-        priceRange {
-          minVariantPrice { amount currencyCode }
-          maxVariantPrice { amount currencyCode }
-        }
-        variants(first: 5) {
-          edges {
-            node {
-              id
-              title
-              availableForSale
-              price { amount currencyCode }
-            }
-          }
-        }
+        availableForSale
+        price { amount currencyCode }
+        compareAtPrice { amount currencyCode }
+        image { url altText }
+        selectedOptions { name value }
       }
     }
   }
 }
 """
 
-COLLECTION_PRODUCTS_QUERY = """
+PRODUCTS_QUERY = (
+    PRODUCT_FRAGMENT
+    + """
+query Products($first: Int!) {
+  products(first: $first) {
+    edges {
+      node { ...ProductFields }
+    }
+  }
+}
+"""
+)
+
+COLLECTION_PRODUCTS_QUERY = (
+    PRODUCT_FRAGMENT
+    + """
 query CollectionProducts($handle: String!, $first: Int!) {
   collection(handle: $handle) {
     id
@@ -99,36 +113,13 @@ query CollectionProducts($handle: String!, $first: Int!) {
     handle
     products(first: $first) {
       edges {
-        node {
-          id
-          handle
-          title
-          description
-          tags
-          productType
-          vendor
-          featuredImage { url altText }
-          images(first: 4) { edges { node { url altText } } }
-          priceRange {
-            minVariantPrice { amount currencyCode }
-            maxVariantPrice { amount currencyCode }
-          }
-          variants(first: 5) {
-            edges {
-              node {
-                id
-                title
-                availableForSale
-                price { amount currencyCode }
-              }
-            }
-          }
-        }
+        node { ...ProductFields }
       }
     }
   }
 }
 """
+)
 
 CART_CREATE_MUTATION = """
 mutation CartCreate($input: CartInput!) {
@@ -311,11 +302,13 @@ def _shape_product(p: Dict[str, Any]) -> Dict[str, Any]:
     variants = _flatten_edges(p.get("variants"))
     price_min = (p.get("priceRange") or {}).get("minVariantPrice") or {}
     price_max = (p.get("priceRange") or {}).get("maxVariantPrice") or {}
+    options = p.get("options") or []
     return {
         "id": p.get("id"),
         "handle": p.get("handle"),
         "title": p.get("title"),
         "description": p.get("description") or "",
+        "descriptionHtml": p.get("descriptionHtml") or "",
         "tags": p.get("tags") or [],
         "productType": p.get("productType") or "",
         "vendor": p.get("vendor") or "",
@@ -323,12 +316,23 @@ def _shape_product(p: Dict[str, Any]) -> Dict[str, Any]:
         "images": images,
         "priceMin": price_min,
         "priceMax": price_max,
+        "options": [
+            {
+                "id": o.get("id"),
+                "name": o.get("name"),
+                "values": o.get("values") or [],
+            }
+            for o in options
+        ],
         "variants": [
             {
                 "id": v.get("id"),
                 "title": v.get("title"),
                 "availableForSale": v.get("availableForSale", False),
                 "price": v.get("price") or {},
+                "compareAtPrice": v.get("compareAtPrice") or None,
+                "image": v.get("image") or None,
+                "selectedOptions": v.get("selectedOptions") or [],
             }
             for v in variants
         ],

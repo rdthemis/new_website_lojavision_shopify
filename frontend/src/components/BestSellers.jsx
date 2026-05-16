@@ -5,12 +5,14 @@ import { EASE, fadeUp, stagger } from "@/lib/animations";
 import { useI18n } from "@/lib/i18n";
 import { useCart, formatPrice } from "@/contexts/CartContext";
 import { fetchProducts } from "@/lib/api";
+import { useProductModal } from "@/contexts/ProductModalContext";
 
 const BEST_SELLER_HANDLES = ["mejores-ventas", "best-sellers", "mais-vendidos"];
 
 const BestSellerCard = ({ product, index = 0 }) => {
   const { add, items } = useCart();
   const { t, lang } = useI18n();
+  const { open: openModal } = useProductModal();
   const [justAdded, setJustAdded] = useState(false);
 
   const variant = product.variants?.[0];
@@ -35,7 +37,21 @@ const BestSellerCard = ({ product, index = 0 }) => {
       className="snap-start shrink-0 w-[78%] sm:w-[44%] md:w-[31%] lg:w-[23%]"
     >
       <div className="bg-white rounded-3xl p-4 hover:shadow-[0_20px_60px_rgba(0,0,0,0.07)] transition-shadow">
-        <div className="relative overflow-hidden rounded-2xl bg-neutral-100" style={{ aspectRatio: "4/5" }}>
+        <div
+          role="button"
+          tabIndex={0}
+          data-testid={`bestseller-image-${product.handle}`}
+          onClick={() => openModal(product)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openModal(product);
+            }
+          }}
+          aria-label={product.title}
+          className="cursor-pointer focus:outline-none"
+        >
+          <div className="relative overflow-hidden rounded-2xl bg-neutral-100" style={{ aspectRatio: "4/5" }}>
           <motion.img
             src={product.featuredImage?.url || product.images?.[0]?.url}
             alt={product.featuredImage?.altText || product.title}
@@ -83,6 +99,7 @@ const BestSellerCard = ({ product, index = 0 }) => {
               </>
             )}
           </button>
+        </div>
         </div>
 
         <div className="px-1 pt-4 pb-2">
