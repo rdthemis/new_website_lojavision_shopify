@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import HeroCarousel from "@/components/HeroCarousel";
 import CategoryMenu from "@/components/CategoryMenu";
 import ProductGrid from "@/components/ProductGrid";
+import Newsletter from "@/components/Newsletter";
 import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -108,6 +109,8 @@ const Storefront = () => {
             loading={loading}
           />
         </div>
+
+        <Newsletter />
       </main>
 
       <Footer dataSource={dataSource} />

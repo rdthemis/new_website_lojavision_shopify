@@ -4,8 +4,11 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import re
+import uuid
 from pathlib import Path
-from pydantic import BaseModel
+from datetime import datetime, timezone
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Any, Dict
 
 import shopify_client as shopify
@@ -188,6 +191,60 @@ async def get_cart(cart_id: str) -> Dict[str, Any]:
 
 class CheckoutBody(BaseModel):
     lines: List[CartLineInput]
+
+
+# ----- Newsletter (email capture for marketing list + welcome coupon) -----
+
+EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+
+
+class NewsletterSubscribeBody(BaseModel):
+    email: str
+    lang: Optional[str] = "pt"
+
+
+@api_router.post("/newsletter/subscribe")
+async def newsletter_subscribe(body: NewsletterSubscribeBody) -> Dict[str, Any]:
+    email = (body.email or "").strip().lower()
+    if not email or not EMAIL_RE.match(email):
+        raise HTTPException(status_code=400, detail="invalid_email")
+
+    coupon_code = os.environ.get("NEWSLETTER_COUPON_CODE", "BEMVINDO10")
+    discount_percent = 10
+    now_iso = datetime.now(timezone.utc).isoformat()
+
+    existing = await db.newsletter_subscribers.find_one({"email": email}, {"_id": 0})
+    if existing:
+        return {
+            "ok": True,
+            "already_subscribed": True,
+            "coupon_code": coupon_code,
+            "discount_percent": discount_percent,
+            "email": email,
+        }
+
+    doc = {
+        "id": str(uuid.uuid4()),
+        "email": email,
+        "lang": body.lang or "pt",
+        "coupon_code": coupon_code,
+        "discount_percent": discount_percent,
+        "created_at": now_iso,
+    }
+    await db.newsletter_subscribers.insert_one(doc)
+    return {
+        "ok": True,
+        "already_subscribed": False,
+        "coupon_code": coupon_code,
+        "discount_percent": discount_percent,
+        "email": email,
+    }
+
+
+@api_router.get("/newsletter/subscribers/count")
+async def newsletter_count() -> Dict[str, Any]:
+    n = await db.newsletter_subscribers.count_documents({})
+    return {"count": n}
 
 
 @api_router.post("/store/checkout")

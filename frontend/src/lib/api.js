@@ -24,3 +24,8 @@ export const startCheckout = async (lines) => {
   const { data } = await api.post(`/store/checkout`, { lines });
   return data; // { data_source, checkoutUrl?, message? }
 };
+
+export const subscribeNewsletter = async (email, lang = "pt") => {
+  const { data } = await api.post(`/newsletter/subscribe`, { email, lang });
+  return data; // { ok, already_subscribed, coupon_code, discount_percent, email }
+};

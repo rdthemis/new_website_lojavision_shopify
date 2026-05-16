@@ -1,0 +1,63 @@
+{
+  "summary": "Iteration 2: validated newsletter feature (backend + frontend) and re-ran full regression now that the Shopify Storefront token is LIVE. Backend pytest 13/13 passing; frontend newsletter flows (form, success card, coupon, clipboard copy, duplicate submit, PT/EN i18n) all pass; cart -> real Shopify checkout on lojavirtualvision.com confirmed. One minor UX gap noted on newsletter input HTML5 validation.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Newsletter form",
+        "issue": "Email input is type=\"email\" and the <form> has no noValidate, so the browser's native HTML5 popup blocks submission for clearly malformed inputs (e.g. 'not-an-email'). The React onSubmit never runs in that case, so the custom data-testid=\"newsletter-error\" element is NEVER rendered for inputs without '@'. The custom error DOES render for inputs that pass HTML5 but fail the JS regex (e.g. 'abc@b'). Recommend either adding noValidate to <motion.form> or changing input type to text so the custom regex-based error and styled message always show.",
+        "selector": "[data-testid=\"newsletter-email-input\"], [data-testid=\"newsletter-form\"]",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Footer / category links",
+        "issues": ["Footer 'Loja' links still hardcoded to demo handles (Tech / Moda / Decoração / Ferramentas) while the live Shopify store actually exposes handles 'mejores-ventas', 'nuevos-arribos', 'ofertas'. Clicking these footer links does not filter to anything real. Cosmetic — not in scope for this iteration but worth flagging."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_store_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Low) Newsletter form: add noValidate on the <form> (or use type=\"text\" on input) so the custom data-testid=\"newsletter-error\" message renders for ALL invalid emails, including those rejected by HTML5 (e.g. 'not-an-email'). Backend already covers all variants with 400.",
+    "(Cosmetic, optional) Footer 'Loja' category links don't match the live Shopify collection handles — either map to live handles or hide when data_source='shopify'."
+  ],
+  "critical_code_review_comments": [
+    "server.py /api/store/checkout still has dead-code total calculation in the demo branch (lines ~262-264). Minor.",
+    "Newsletter endpoint correctly excludes _id from MongoDB find_one projection and response payload — verified.",
+    "EMAIL_RE on backend matches the same JS regex on the frontend (^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$), so backend/frontend validation are consistent."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_store_api.py (rewritten to expect data_source='shopify' and added TestNewsletter class with 8 cases)"
+  ],
+  "success_rate": {"backend": "100% (13/13)", "frontend": "100% on core newsletter + regression flows"},
+  "test_credentials": "N/A — no auth in app",
+  "seed_data_creation": "Each newsletter test uses a unique uuid-suffixed email (no cleanup needed); count endpoint verified by delta.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Shopify token is LIVE — backend /api/store/* endpoints now return data_source='shopify' with real BRL pricing; /api/store/checkout returns real cart with checkoutUrl pointing to lojavirtualvision.com. The store exposes 3 collection handles (mejores-ventas, nuevos-arribos, ofertas); demo handles (tech/moda/decoracao/ferramentas) are NOT present in the live store, so any test that asserts those handles in /api/store/collections will fail unless token is rolled back. Newsletter feature uses MongoDB collection 'newsletter_subscribers'; do NOT clear it between runs — use uuid-suffixed emails. Frontend newsletter input has HTML5 type=email which blocks browser submit for obvious non-emails; the custom error testid only renders for inputs that pass HTML5 but fail the stricter JS regex.",
+  "verified_features": [
+    "POST /api/newsletter/subscribe valid email -> 200, ok=true, already_subscribed=false, coupon=BEMVINDO10, discount=10, email lowercased, no _id",
+    "POST /api/newsletter/subscribe duplicate (case-insensitive) -> 200, already_subscribed=true, same coupon",
+    "POST /api/newsletter/subscribe invalid email ('not-an-email','', 'abc@','noatsign.com','   ') -> 400 detail='invalid_email'",
+    "GET /api/newsletter/subscribers/count -> integer, increments by 1 after new subscription",
+    "GET /api/health -> 200, storefront_token_configured=true",
+    "GET /api/store/collections -> data_source=shopify, handles cleaned (no frontpage / todos-los-productos)",
+    "GET /api/store/products -> data_source=shopify, BRL pricing, no _id leak",
+    "POST /api/store/checkout with real variantId -> data_source=shopify and checkoutUrl on lojavirtualvision.com",
+    "GET /api/shopify/collections -> 200 (was 502 in iter 1)",
+    "Frontend newsletter section visible after products and before footer",
+    "Newsletter valid email submit -> success card with coupon BEMVINDO10 visible",
+    "Newsletter copy button: 'Copiar' -> 'Copiado!' for ~2s, clipboard contains 'BEMVINDO10', then reverts",
+    "Newsletter duplicate submit (same email, after reload) still shows success state with coupon",
+    "Newsletter PT/EN toggle: title, placeholder, CTA all switch correctly",
+    "Regression: Add-to-cart updates header badge to 1; cart drawer opens; 'Finalizar Compra' navigates to https://lojavirtualvision.com/checkouts/... (real Shopify checkout)"
+  ]
+}
