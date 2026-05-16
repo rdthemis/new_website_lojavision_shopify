@@ -61,7 +61,15 @@ const CategoryMenu = ({ collections = [], activeHandle, onSelect }) => {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[180px] md:auto-rows-[220px]">
         {collections.slice(0, 4).map((c, i) => {
-          const isFeatured = i === 0;
+          const count = Math.min(collections.length, 4);
+          const isFeatured = i === 0 && count >= 3;
+          // For 3 items: featured spans 2 cols × 1 row + 2 single tiles = clean single row
+          // For 4 items: featured spans 2 cols × 2 rows + 3 single tiles fill the rest
+          // For ≤2 items: every tile single
+          const featuredSpan =
+            count === 3
+              ? "col-span-2 row-span-1 md:col-span-2 md:row-span-1"
+              : "col-span-2 row-span-2";
           const isActive = activeHandle === c.handle;
           return (
             <motion.button
@@ -73,7 +81,7 @@ const CategoryMenu = ({ collections = [], activeHandle, onSelect }) => {
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 1.0, ease: EASE, delay: i * 0.12 }}
               className={`group relative overflow-hidden rounded-3xl text-left ${
-                isFeatured ? "col-span-2 row-span-2" : "col-span-1 row-span-1"
+                isFeatured ? featuredSpan : "col-span-1 row-span-1"
               }`}
             >
               <motion.img

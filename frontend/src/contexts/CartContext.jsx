@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useMemo, useEf
 
 const CartContext = createContext(null);
 
-const STORAGE_KEY = "vision_cart_v1";
+const STORAGE_KEY = "vision_cart_v2";
 
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState(() => {

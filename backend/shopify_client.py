@@ -371,7 +371,24 @@ def _shape_cart(c: Dict[str, Any]) -> Dict[str, Any]:
 async def list_collections(first: int = 20) -> list:
     data = await gql(COLLECTIONS_QUERY, {"first": first})
     nodes = _flatten_edges(data.get("collections"))
-    return [_shape_collection(n) for n in nodes]
+    # Filter out generic "catch-all" handles and de-dup numeric suffixes
+    # (Shopify/DROPI can sync the same collection multiple times as handle-1, handle-2…)
+    excluded = {"frontpage", "todos-los-productos", "todos-os-produtos", "all"}
+    seen_bases = set()
+    cleaned: list = []
+    for n in nodes:
+        handle = (n.get("handle") or "").lower()
+        if not handle or handle in excluded:
+            continue
+        # Strip trailing "-<digits>" to detect duplicates of the same logical collection
+        base = handle
+        while base and base.rsplit("-", 1)[-1].isdigit():
+            base = base.rsplit("-", 1)[0]
+        if base in excluded or base in seen_bases:
+            continue
+        seen_bases.add(base)
+        cleaned.append(_shape_collection(n))
+    return cleaned
 
 
 async def list_products(first: int = 24, collection_handle: Optional[str] = None) -> list:

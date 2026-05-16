@@ -37,33 +37,34 @@
 8. data-testid coverage on every interactive element
 
 ## What's Been Implemented (Dec 2025)
-- ✅ Shopify Storefront GraphQL client (collections, products, cart create/add/update/remove, get) — ready when token is valid
-- ✅ Demo fallback layer (4 collections, 8 products) — automatically engages when Shopify returns errors
+- ✅ **LIVE Shopify integration** — Storefront token `77082de5774ce82a8be36717c4886aa1` (Headless app) authenticates against `f8ujhx-36.myshopify.com` (Loja Virtual Vision) on API version 2025-10. Real DROPI-synced products render with BRL pricing.
+- ✅ **Real checkout verified** — "Finalizar Compra" creates Shopify cart and redirects to `https://lojavirtualvision.com/checkouts/...` (Visa/Master/Amex enabled).
+- ✅ Shopify Storefront GraphQL client (collections, products, cart create/add/update/remove, get)
+- ✅ Demo fallback layer (4 collections, 8 products) kept as safety net if Shopify becomes unreachable
 - ✅ Unified `/api/store/*` endpoints + direct `/api/shopify/*` proxies
+- ✅ Collection cleanup: filters generic handles (`frontpage`, `todos-los-productos`) and dedupes `-N` numeric duplicates
 - ✅ Bilingual PT/EN UI with persistent language preference (localStorage)
 - ✅ Hero carousel with Ken-Burns + staggered text reveals
-- ✅ Bento category grid (Tech 2x2 featured + 3 single tiles)
+- ✅ Bento category grid (adaptive layout: 3 tiles = single row, 4 tiles = asymmetric 2x2 featured)
 - ✅ Product grid with filter pills + responsive layout
-- ✅ Slide-in cart drawer with qty controls, remove, subtotal, demo-aware checkout
+- ✅ Slide-in cart drawer with qty controls, remove, subtotal, real Shopify checkout redirect
 - ✅ Sticky glass header with cart badge + lang toggle
-- ✅ Dark footer with shopify/demo source badge
-- ✅ All testing passed (10/10 backend pytest + full frontend E2E)
+- ✅ Dark footer with "Shopify connected" live badge
+- ✅ All testing passed (10/10 backend pytest + full frontend E2E including real-checkout navigation)
 
 ## Backlog
-**P0 (block real-production launch)**
-- Replace `atkn_…` / `shpss_…` token in `backend/.env` with a valid Storefront API access token (the user needs to install the Custom App and grant Storefront API scopes); no code change required.
+**P0** — *(none — production-ready as of this iteration)*
 
 **P1 (revenue / conversion)**
-- Newsletter capture section (email → MongoDB)
+- Newsletter capture section (email → MongoDB) with first-order coupon
 - Product quick-view modal (image gallery + variants picker)
-- "Best seller" / "New arrival" tag rendering when present in Shopify metafields
 - Cross-sell module under cart drawer
 
 **P2 (polish)**
 - Skeleton shimmer instead of static pulse
-- Light/dark theme toggle
 - Page-level i18n for product descriptions when Shopify ships localised storefront
+- Friendlier collection title overrides (Mejores Ventas → "Mais Vendidos" in PT)
 
 ## Next Tasks
-1. (User) Generate a real Shopify Storefront API access token from the meu-app-vision-2 custom app and replace `SHOPIFY_STOREFRONT_TOKEN` in `backend/.env`. Restart backend → landing automatically switches `data_source` to `shopify` and `Finalizar Compra` becomes a real Shopify-hosted checkout redirect.
-2. (Optional) Add the newsletter capture block to convert browsers into subscribers.
+1. (Optional) Add newsletter capture block + first-order coupon to convert browsers into subscribers.
+2. (Optional) Add a "Mais Vendidos / Best Sellers" label override so Spanish DROPI collection titles read naturally in PT/EN.
