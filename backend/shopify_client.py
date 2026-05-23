@@ -10,7 +10,7 @@ class ShopifyError(Exception):
 
 def _endpoint() -> str:
     domain = os.environ.get("SHOPIFY_STORE_DOMAIN")
-    version = os.environ.get("SHOPIFY_API_VERSION", "2024-10")
+    version = os.environ.get("SHOPIFY_API_VERSION", "2024-04")
     if not domain:
         raise ShopifyError("SHOPIFY_STORE_DOMAIN not configured")
     return f"https://{domain}/api/{version}/graphql.json"
