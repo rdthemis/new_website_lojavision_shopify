@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://newwebsitelojavisionshopify-production.up.railway.app";
 export const API = `${BACKEND_URL}/api`;
 
 export const api = axios.create({
