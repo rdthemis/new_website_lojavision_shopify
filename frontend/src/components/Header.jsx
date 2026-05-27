@@ -37,7 +37,7 @@ const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
              * w-auto mantém a proporção original.
              * group-hover: leve escala para dar feedback de clique.
              */
-            className="h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+            className="h-10 md:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
             draggable={false}
           />
         </button>
