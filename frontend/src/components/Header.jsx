@@ -7,7 +7,7 @@ import { useI18n } from "@/lib/i18n";
 // Importe a logo — ajuste o caminho conforme sua estrutura de pastas:
 // Ex: import visionLogo from "@/assets/vision-logo-site-2.png";
 // ou coloque em /public e use src="/vision-logo-site-2.png"
-import visionLogo from "@/assets/vision-logo-site-2.png";
+import visionLogo from "@/assets/vision-logo-site-transparente.png";
 
 const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
   const { totalQuantity, setOpen } = useCart();
@@ -18,7 +18,7 @@ const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
       data-testid="site-header"
       className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/70 border-b border-black/5"
     >
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 h-16 flex items-center justify-between">
+      <div className="mx-auto max-w-7xl px-6 lg:px-10 h-32 flex items-center justify-between">
 
         {/* ── Logo ── */}
         <button
@@ -37,7 +37,8 @@ const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
              * w-auto mantém a proporção original.
              * group-hover: leve escala para dar feedback de clique.
              */
-            className="h-10 md:h-12 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+            className="h-20 md:h-32 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+            style={{ mixBlendMode: "multiply" }} 
             draggable={false}
           />
         </button>
