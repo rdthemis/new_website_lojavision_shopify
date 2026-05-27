@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useI18n } from "@/lib/i18n";
 
+// Importe a logo — ajuste o caminho conforme sua estrutura de pastas:
+// Ex: import visionLogo from "@/assets/vision-logo-site-2.png";
+// ou coloque em /public e use src="/vision-logo-site-2.png"
+import visionLogo from "@/assets/vision-logo-site-2.png";
+
 const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
   const { totalQuantity, setOpen } = useCart();
   const { t, lang, setLang } = useI18n();
@@ -14,22 +19,30 @@ const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
       className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/70 border-b border-black/5"
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-10 h-16 flex items-center justify-between">
+
+        {/* ── Logo ── */}
         <button
           data-testid="brand-logo"
           onClick={onJumpTop}
-          className="flex items-center gap-2 group"
+          className="flex items-center group focus:outline-none"
+          aria-label="Vision Loja Virtual — ir ao topo"
         >
-          <span
-            className="w-8 h-8 rounded-2xl flex items-center justify-center text-white font-bold text-sm"
-            style={{ backgroundColor: "#FF574D" }}
-          >
-            V
-          </span>
-          <span className="font-display text-xl tracking-tight font-semibold text-neutral-900">
-            vision<span style={{ color: "#FF574D" }}>.</span>
-          </span>
+          <img
+            src={visionLogo}
+            alt="Vision Loja Virtual"
+            /*
+             * A logo tem fundo branco puro, então ela se integra naturalmente
+             * ao header translúcido (bg-white/70).
+             * h-10 = 40 px → caberá confortavelmente dentro do header de 64 px.
+             * w-auto mantém a proporção original.
+             * group-hover: leve escala para dar feedback de clique.
+             */
+            className="h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-[1.03]"
+            draggable={false}
+          />
         </button>
 
+        {/* ── Navegação ── */}
         <nav className="hidden md:flex items-center gap-8 text-sm text-neutral-700">
           <button
             data-testid="nav-home"
@@ -54,6 +67,7 @@ const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
           </button>
         </nav>
 
+        {/* ── Ações direita ── */}
         <div className="flex items-center gap-2">
           <button
             data-testid="lang-toggle"
@@ -85,6 +99,7 @@ const Header = ({ onJumpCategories, onJumpProducts, onJumpTop }) => {
             <span className="sr-only">{t.nav.cart}</span>
           </Button>
         </div>
+
       </div>
     </header>
   );
